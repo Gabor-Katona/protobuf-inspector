@@ -1,0 +1,94 @@
+{
+  "name": "protobuf-tool",
+  "displayName": "protobuf-tool",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:proto"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "protobuf-tool.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "protobuf-tool.codelensAction",
+        "title": "Protobuf Tool CodeLens Action"
+      },
+      {
+        "command": "protobuf-tool.newProtoItem",
+        "title": "New Protobuf Item..."
+      },
+      {
+        "command": "protobuf-tool.decodeMessage",
+        "title": "Decode Protobuf Message"
+      },
+      {
+        "command": "protobuf-tool.decodeMessageAtCursor",
+        "title": "Decode Protobuf Message..."
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "protobuf-tool.newProtoItem",
+          "when": "resourceExtname == .proto",
+          "group": "navigation@2"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "protobuf-tool.newProtoItem",
+          "when": "resourceExtname == .proto",
+          "group": "navigation@2"
+        },
+        {
+          "command": "protobuf-tool.decodeMessageAtCursor",
+          "when": "resourceExtname == .proto",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "proto",
+        "aliases": [
+          "Proto"
+        ],
+        "extensions": [
+          ".proto"
+        ],
+        "configuration": ""
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.109.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.54.0"
+  },
+  "dependencies": {
+    "protobufjs": "^8.0.0"
+  }
+}
