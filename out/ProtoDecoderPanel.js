@@ -35,18 +35,16 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtoDecoderPanel = void 0;
 const vscode = __importStar(require("vscode"));
-const protobuf = __importStar(require("protobufjs"));
 const path = __importStar(require("path"));
+const ProtoService_1 = require("./ProtoService");
 class ProtoDecoderPanel {
     static currentPanel;
     _panel;
     _disposables = [];
-    _protoFilePath;
-    _messageName;
+    _service;
     constructor(panel, protoFilePath, messageName) {
         this._panel = panel;
-        this._protoFilePath = protoFilePath;
-        this._messageName = messageName;
+        this._service = new ProtoService_1.ProtoService(protoFilePath, messageName);
         this._update();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
         this._panel.webview.onDidReceiveMessage(async (message) => {
@@ -66,8 +64,7 @@ class ProtoDecoderPanel {
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
         if (ProtoDecoderPanel.currentPanel) {
-            ProtoDecoderPanel.currentPanel._protoFilePath = protoFilePath;
-            ProtoDecoderPanel.currentPanel._messageName = messageName;
+            ProtoDecoderPanel.currentPanel._service = new ProtoService_1.ProtoService(protoFilePath, messageName);
             ProtoDecoderPanel.currentPanel._update();
             ProtoDecoderPanel.currentPanel._panel.reveal(column);
             return;
@@ -80,195 +77,29 @@ class ProtoDecoderPanel {
     }
     async _handleDecode(input, format) {
         try {
-            const trimmed = input.trim();
-            if (!trimmed) {
-                this._postError(`Please enter ${format === 'hex' ? 'hex' : 'base64'}-encoded protobuf binary data.`);
-                return;
-            }
-            let buffer;
-            try {
-                if (format === 'hex') {
-                    const hexClean = trimmed.replace(/\s+/g, '');
-                    if (!/^[0-9a-fA-F]*$/.test(hexClean) || hexClean.length % 2 !== 0) {
-                        this._postError('Invalid hex input. Must be an even number of hex characters (0-9, a-f).');
-                        return;
-                    }
-                    buffer = Buffer.from(hexClean, 'hex');
-                }
-                else {
-                    buffer = Buffer.from(trimmed, 'base64');
-                }
-            }
-            catch {
-                this._postError(`Invalid ${format} input. Please check and try again.`);
-                return;
-            }
-            let root;
-            try {
-                root = await protobuf.load(this._protoFilePath);
-            }
-            catch (e) {
-                const msg = e instanceof Error ? e.message : String(e);
-                this._postError(`Failed to parse .proto file: ${msg}`);
-                return;
-            }
-            let messageType;
-            try {
-                messageType = root.lookupType(this._messageName);
-            }
-            catch {
-                this._postError(`Message type '${this._messageName}' not found in ${path.basename(this._protoFilePath)}.`);
-                return;
-            }
-            let decoded;
-            try {
-                decoded = messageType.decode(buffer);
-            }
-            catch (e) {
-                const msg = e instanceof Error ? e.message : String(e);
-                this._postError(`Decode failed: ${msg}\n\nMake sure the binary data matches the '${this._messageName}' message format.`);
-                return;
-            }
-            const obj = messageType.toObject(decoded, {
-                longs: String,
-                enums: String,
-                bytes: String,
-                defaults: true,
-                arrays: true,
-                objects: true,
-                oneofs: true
-            });
-            const json = JSON.stringify(obj, null, 2);
+            const json = await this._service.decode(input, format);
             this._panel.webview.postMessage({ command: 'result', json });
         }
         catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            this._postError(`Unexpected error: ${msg}`);
+            this._postError(e instanceof Error ? e.message : String(e));
         }
     }
     async _handleEncode(jsonInput, format) {
         try {
-            const trimmed = jsonInput.trim();
-            if (!trimmed) {
-                this._postEncodeError('Please enter a JSON object to encode.');
-                return;
-            }
-            let obj;
-            try {
-                obj = JSON.parse(trimmed);
-            }
-            catch {
-                this._postEncodeError('Invalid JSON input. Please check the syntax and try again.');
-                return;
-            }
-            let root;
-            try {
-                root = await protobuf.load(this._protoFilePath);
-            }
-            catch (e) {
-                const msg = e instanceof Error ? e.message : String(e);
-                this._postEncodeError(`Failed to parse .proto file: ${msg}`);
-                return;
-            }
-            let messageType;
-            try {
-                messageType = root.lookupType(this._messageName);
-            }
-            catch {
-                this._postEncodeError(`Message type '${this._messageName}' not found in ${path.basename(this._protoFilePath)}.`);
-                return;
-            }
-            const errMsg = messageType.verify(obj);
-            if (errMsg) {
-                this._postEncodeError(`Validation failed: ${errMsg}`);
-                return;
-            }
-            let encoded;
-            try {
-                const msg = messageType.fromObject(obj);
-                encoded = Buffer.from(messageType.encode(msg).finish());
-            }
-            catch (e) {
-                const msg = e instanceof Error ? e.message : String(e);
-                this._postEncodeError(`Encode failed: ${msg}`);
-                return;
-            }
-            const output = format === 'hex' ? encoded.toString('hex') : encoded.toString('base64');
+            const output = await this._service.encode(jsonInput, format);
             this._panel.webview.postMessage({ command: 'encodeResult', output, format });
         }
         catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            this._postEncodeError(`Unexpected error: ${msg}`);
+            this._postEncodeError(e instanceof Error ? e.message : String(e));
         }
     }
     async _handleGetTemplate() {
         try {
-            let root;
-            try {
-                root = await protobuf.load(this._protoFilePath);
-            }
-            catch (e) {
-                const msg = e instanceof Error ? e.message : String(e);
-                this._postEncodeError(`Failed to parse .proto file: ${msg}`);
-                return;
-            }
-            let messageType;
-            try {
-                messageType = root.lookupType(this._messageName);
-            }
-            catch {
-                this._postEncodeError(`Message type '${this._messageName}' not found.`);
-                return;
-            }
-            const template = this._buildTemplate(messageType, new Set());
-            const json = JSON.stringify(template, null, 2);
+            const json = await this._service.getTemplate();
             this._panel.webview.postMessage({ command: 'templateResult', json });
         }
         catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            this._postEncodeError(`Unexpected error: ${msg}`);
-        }
-    }
-    _buildTemplate(messageType, visited) {
-        const obj = {};
-        const typeName = messageType.fullName ?? messageType.name;
-        // Guard against infinite recursion for self-referential messages
-        if (visited.has(typeName)) {
-            return obj;
-        }
-        const nextVisited = new Set(visited);
-        nextVisited.add(typeName);
-        for (const field of Object.values(messageType.fields)) {
-            field.resolve();
-            const isRepeated = field.repeated;
-            let value;
-            if (field.resolvedType instanceof protobuf.Type) {
-                // Nested message
-                const nested = this._buildTemplate(field.resolvedType, nextVisited);
-                value = isRepeated ? [nested] : nested;
-            }
-            else if (field.resolvedType instanceof protobuf.Enum) {
-                // Enum — use the first named value
-                const firstKey = Object.keys(field.resolvedType.values)[0] ?? '';
-                value = isRepeated ? [firstKey] : firstKey;
-            }
-            else {
-                // Scalar
-                const scalar = this._scalarDefault(field.type);
-                value = isRepeated ? [scalar] : scalar;
-            }
-            obj[field.name] = value;
-        }
-        return obj;
-    }
-    _scalarDefault(type) {
-        switch (type) {
-            case 'string': return '';
-            case 'bool': return false;
-            case 'bytes': return '';
-            case 'float':
-            case 'double': return 0.0;
-            default: return 0; // all integer types
+            this._postEncodeError(e instanceof Error ? e.message : String(e));
         }
     }
     _postError(message) {
@@ -278,17 +109,18 @@ class ProtoDecoderPanel {
         this._panel.webview.postMessage({ command: 'encodeError', message });
     }
     _update() {
-        this._panel.title = `Proto Tool: ${this._messageName}`;
+        this._panel.title = `Proto Tool: ${this._service.messageName}`;
         this._panel.webview.html = this._getHtmlForWebview();
     }
     _getHtmlForWebview() {
-        const fileName = path.basename(this._protoFilePath);
+        const fileName = path.basename(this._service.protoFilePath);
+        const messageName = this._service.messageName;
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proto Tool: ${this._messageName}</title>
+    <title>Proto Tool: ${messageName}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -487,7 +319,7 @@ class ProtoDecoderPanel {
 </head>
 <body>
     <div class="header">
-        <h1>&#128268; <strong>${this._messageName}</strong></h1>
+        <h1>&#128268; <strong>${messageName}</strong></h1>
         <div class="subtitle">from <code>${fileName}</code></div>
     </div>
 
@@ -512,6 +344,7 @@ class ProtoDecoderPanel {
             placeholder="Paste base64-encoded protobuf binary data here..."
             spellcheck="false"
             autocomplete="off"
+            style="min-height:140px"
         ></textarea>
         <div class="hint" id="decode-hint">Paste base64-encoded binary protobuf payload (e.g. <code>CgVXb3JsZA==</code>)</div>
         <div class="actions">
@@ -545,7 +378,7 @@ class ProtoDecoderPanel {
             autocomplete="off"
             style="min-height:140px"
         ></textarea>
-        <div class="hint">Enter a JSON object matching the <code>${this._messageName}</code> message structure. Use <em>Generate Template</em> to prefill the schema.</div>
+        <div class="hint">Enter a JSON object matching the <code>${messageName}</code> message structure. Use <em>Generate Template</em> to prefill the schema.</div>
         <div class="actions">
             <button id="encode-btn" onclick="encodeMsg()">&#11178; Encode</button>
             <button class="clear-btn" onclick="clearEncode()">Clear</button>
