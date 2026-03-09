@@ -54,15 +54,30 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showWarningMessage('Open a .proto file first.');
 				return;
 			}
-			const cursorLine = editor.selection.active.line;
 			const text = editor.document.getText();
 			const lines = text.split('\n');
-			const messageRegex = /^message\s+(\w+)\s*\{/;
+			const messageDefRegex = /^message\s+(\w+)\s*\{/;
 
-			// Walk upward from the cursor to find the nearest enclosing message
+			// Collect all message names defined in this file
+			const allMessageNames = new Set<string>();
+			for (const line of lines) {
+				const m = line.match(messageDefRegex);
+				if (m) { allMessageNames.add(m[1]); }
+			}
+
+			// 1. Check if the word under the cursor is a known message name
+			const wordRange = editor.document.getWordRangeAtPosition(editor.selection.active, /\w+/);
+			const wordUnderCursor = wordRange ? editor.document.getText(wordRange) : undefined;
+			if (wordUnderCursor && allMessageNames.has(wordUnderCursor)) {
+				ProtoDecoderPanel.createOrShow(editor.document.uri.fsPath, wordUnderCursor);
+				return;
+			}
+
+			// 2. Fall back: walk upward from the cursor to find the nearest enclosing message
+			const cursorLine = editor.selection.active.line;
 			let messageName: string | undefined;
 			for (let i = cursorLine; i >= 0; i--) {
-				const m = lines[i].match(messageRegex);
+				const m = lines[i].match(messageDefRegex);
 				if (m) {
 					messageName = m[1];
 					break;

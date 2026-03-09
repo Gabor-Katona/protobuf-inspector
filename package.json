@@ -24,32 +24,16 @@
         "title": "Protobuf Tool CodeLens Action"
       },
       {
-        "command": "protobuf-tool.newProtoItem",
-        "title": "New Protobuf Item..."
-      },
-      {
         "command": "protobuf-tool.decodeMessage",
         "title": "Decode Protobuf Message"
       },
       {
         "command": "protobuf-tool.decodeMessageAtCursor",
-        "title": "Decode Protobuf Message..."
+        "title": "Decode / Encode Protobuf Message..."
       }
     ],
     "menus": {
-      "explorer/context": [
-        {
-          "command": "protobuf-tool.newProtoItem",
-          "when": "resourceExtname == .proto",
-          "group": "navigation@2"
-        }
-      ],
       "editor/context": [
-        {
-          "command": "protobuf-tool.newProtoItem",
-          "when": "resourceExtname == .proto",
-          "group": "navigation@2"
-        },
         {
           "command": "protobuf-tool.decodeMessageAtCursor",
           "when": "resourceExtname == .proto",
