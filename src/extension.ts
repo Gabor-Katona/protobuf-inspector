@@ -45,6 +45,46 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(decodeMessageDisposable);
 
+	// Register command-palette command — picks a message and opens the decode/encode panel
+	const openDecodePanelDisposable = vscode.commands.registerCommand(
+		'protobuf-tool.openDecodePanel',
+		async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor || editor.document.languageId !== 'proto') {
+				vscode.window.showWarningMessage('Open a .proto file first.');
+				return;
+			}
+
+			const text = editor.document.getText();
+			const messageRegex = /^message\s+(\w+)\s*\{/gm;
+			const messages: string[] = [];
+			let match: RegExpExecArray | null;
+			while ((match = messageRegex.exec(text)) !== null) {
+				messages.push(match[1]);
+			}
+
+			if (messages.length === 0) {
+				vscode.window.showWarningMessage('No message definitions found in this file.');
+				return;
+			}
+
+			let messageName: string | undefined;
+			if (messages.length === 1) {
+				messageName = messages[0];
+			} else {
+				messageName = await vscode.window.showQuickPick(messages, {
+					placeHolder: 'Select a message to decode/encode',
+					title: 'Protobuf Message'
+				});
+			}
+
+			if (messageName) {
+				ProtoDecoderPanel.createOrShow(editor.document.uri.fsPath, messageName);
+			}
+		}
+	);
+	context.subscriptions.push(openDecodePanelDisposable);
+
 	// ...existing code...
 }
 
