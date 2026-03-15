@@ -50,12 +50,24 @@ export function activate(context: vscode.ExtensionContext) {
 		'protobuf-tool.openDecodePanel',
 		async () => {
 			const editor = vscode.window.activeTextEditor;
-			if (!editor || editor.document.languageId !== 'proto') {
-				vscode.window.showWarningMessage('Open a .proto file first.');
-				return;
+
+			let fileUri: vscode.Uri | undefined;
+			if (editor && editor.document.languageId === 'proto') {
+				fileUri = editor.document.uri;
+			} else {
+				const picked = await vscode.window.showOpenDialog({
+					canSelectMany: false,
+					filters: { 'Proto files': ['proto'] },
+					title: 'Select a .proto file'
+				});
+				if (!picked || picked.length === 0) {
+					return;
+				}
+				fileUri = picked[0];
 			}
 
-			const text = editor.document.getText();
+			const document = await vscode.workspace.openTextDocument(fileUri);
+			const text = document.getText();
 			const messageRegex = /^message\s+(\w+)\s*\{/gm;
 			const messages: string[] = [];
 			let match: RegExpExecArray | null;
@@ -79,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			if (messageName) {
-				ProtoDecoderPanel.createOrShow(editor.document.uri.fsPath, messageName);
+				ProtoDecoderPanel.createOrShow(fileUri.fsPath, messageName);
 			}
 		}
 	);
