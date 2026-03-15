@@ -96,8 +96,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 	context.subscriptions.push(openDecodePanelDisposable);
-
-	// ...existing code...
 }
 
 // This method is called when your extension is deactivated

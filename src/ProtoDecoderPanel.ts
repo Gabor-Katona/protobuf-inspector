@@ -3,14 +3,16 @@ import * as path from 'path';
 import { ProtoService } from './ProtoService';
 
 export class ProtoDecoderPanel {
-    public static currentPanel: ProtoDecoderPanel | undefined;
+    private static readonly _panels = new Map<string, ProtoDecoderPanel>();
 
     private readonly _panel: vscode.WebviewPanel;
+    private readonly _key: string;
     private _disposables: vscode.Disposable[] = [];
 
     private _service: ProtoService;
 
     private constructor(panel: vscode.WebviewPanel, protoFilePath: string, messageName: string) {
+        this._key = ProtoDecoderPanel._makeKey(protoFilePath, messageName);
         this._panel = panel;
         this._service = new ProtoService(protoFilePath, messageName);
 
@@ -33,29 +35,50 @@ export class ProtoDecoderPanel {
         );
     }
 
+    private static _makeKey(protoFilePath: string, messageName: string): string {
+        return `${protoFilePath}::${messageName}`;
+    }
+
     public static createOrShow(protoFilePath: string, messageName: string): void {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
 
-        if (ProtoDecoderPanel.currentPanel) {
-            ProtoDecoderPanel.currentPanel._service = new ProtoService(protoFilePath, messageName);
-            ProtoDecoderPanel.currentPanel._update();
-            ProtoDecoderPanel.currentPanel._panel.reveal(column);
-            return;
+        const config = vscode.workspace.getConfiguration('protobuf-tool');
+        const reuseTab = config.get<string>('panelMode', 'newTab') === 'reuseTab';
+
+        if (reuseTab) {
+            // Reuse the single shared panel if one is open
+            const sharedEntry = ProtoDecoderPanel._panels.values().next();
+            if (!sharedEntry.done && sharedEntry.value) {
+                const existing = sharedEntry.value;
+                existing._service = new ProtoService(protoFilePath, messageName);
+                existing._update();
+                existing._panel.reveal(column);
+                return;
+            }
+        } else {
+            // Per-message panel: reveal if this exact combo is already open
+            const key = ProtoDecoderPanel._makeKey(protoFilePath, messageName);
+            const existing = ProtoDecoderPanel._panels.get(key);
+            if (existing) {
+                existing._panel.reveal(column);
+                return;
+            }
         }
 
+        const key = ProtoDecoderPanel._makeKey(protoFilePath, messageName);
         const panel = vscode.window.createWebviewPanel(
             'protobufDecoder',
             `Decode: ${messageName}`,
-            column || vscode.ViewColumn.Beside,
+            column || vscode.ViewColumn.Active,
             {
                 enableScripts: true,
                 retainContextWhenHidden: true
             }
         );
 
-        ProtoDecoderPanel.currentPanel = new ProtoDecoderPanel(panel, protoFilePath, messageName);
+        ProtoDecoderPanel._panels.set(key, new ProtoDecoderPanel(panel, protoFilePath, messageName));
     }
 
     private async _handleDecode(input: string, format: 'base64' | 'hex'): Promise<void> {
@@ -518,7 +541,7 @@ export class ProtoDecoderPanel {
     }
 
     public dispose(): void {
-        ProtoDecoderPanel.currentPanel = undefined;
+        ProtoDecoderPanel._panels.delete(this._key);
         this._panel.dispose();
         while (this._disposables.length) {
             const d = this._disposables.pop();

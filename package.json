@@ -39,7 +39,22 @@
           ".proto"
         ]
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Protobuf Tool",
+      "properties": {
+        "protobuf-tool.panelMode": {
+          "type": "string",
+          "enum": ["reuseTab", "newTab"],
+          "enumDescriptions": [
+            "Reuse a single shared tab, replacing its content when a different message is opened.",
+            "Open a new tab for each unique proto file + message combination. Reveal the existing tab if it is already open."
+          ],
+          "default": "reuseTab",
+          "description": "Controls how the decode/encode panel is opened."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

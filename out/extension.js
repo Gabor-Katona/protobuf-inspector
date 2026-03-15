@@ -119,7 +119,6 @@ function activate(context) {
         }
     });
     context.subscriptions.push(openDecodePanelDisposable);
-    // ...existing code...
 }
 // This method is called when your extension is deactivated
 function deactivate() { }
