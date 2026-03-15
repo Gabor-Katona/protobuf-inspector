@@ -45,56 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(decodeMessageDisposable);
 
-	// Register the context-menu command — resolves the message name from the cursor position
-	const decodeAtCursorDisposable = vscode.commands.registerCommand(
-		'protobuf-tool.decodeMessageAtCursor',
-		() => {
-			const editor = vscode.window.activeTextEditor;
-			if (!editor || editor.document.languageId !== 'proto') {
-				vscode.window.showWarningMessage('Open a .proto file first.');
-				return;
-			}
-			const text = editor.document.getText();
-			const lines = text.split('\n');
-			const messageDefRegex = /^message\s+(\w+)\s*\{/;
-
-			// Collect all message names defined in this file
-			const allMessageNames = new Set<string>();
-			for (const line of lines) {
-				const m = line.match(messageDefRegex);
-				if (m) { allMessageNames.add(m[1]); }
-			}
-
-			// 1. Check if the word under the cursor is a known message name
-			const wordRange = editor.document.getWordRangeAtPosition(editor.selection.active, /\w+/);
-			const wordUnderCursor = wordRange ? editor.document.getText(wordRange) : undefined;
-			if (wordUnderCursor && allMessageNames.has(wordUnderCursor)) {
-				ProtoDecoderPanel.createOrShow(editor.document.uri.fsPath, wordUnderCursor);
-				return;
-			}
-
-			// 2. Fall back: walk upward from the cursor to find the nearest enclosing message
-			const cursorLine = editor.selection.active.line;
-			let messageName: string | undefined;
-			for (let i = cursorLine; i >= 0; i--) {
-				const m = lines[i].match(messageDefRegex);
-				if (m) {
-					messageName = m[1];
-					break;
-				}
-			}
-
-			if (!messageName) {
-				vscode.window.showWarningMessage(
-					'Could not find a message definition at or above the cursor. Place your cursor inside a message block and try again.'
-				);
-				return;
-			}
-
-			ProtoDecoderPanel.createOrShow(editor.document.uri.fsPath, messageName);
-		}
-	);
-	context.subscriptions.push(decodeAtCursorDisposable);
+	// ...existing code...
 }
 
 // This method is called when your extension is deactivated

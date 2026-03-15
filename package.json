@@ -12,6 +12,7 @@
   "activationEvents": [
     "onLanguage:proto"
   ],
+  
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -20,27 +21,10 @@
         "title": "Hello World"
       },
       {
-        "command": "protobuf-tool.codelensAction",
-        "title": "Protobuf Tool CodeLens Action"
-      },
-      {
         "command": "protobuf-tool.decodeMessage",
         "title": "Decode Protobuf Message"
-      },
-      {
-        "command": "protobuf-tool.decodeMessageAtCursor",
-        "title": "Decode / Encode Protobuf Message..."
       }
     ],
-    "menus": {
-      "editor/context": [
-        {
-          "command": "protobuf-tool.decodeMessageAtCursor",
-          "when": "resourceExtname == .proto",
-          "group": "navigation@3"
-        }
-      ]
-    },
     "languages": [
       {
         "id": "proto",
@@ -49,8 +33,7 @@
         ],
         "extensions": [
           ".proto"
-        ],
-        "configuration": ""
+        ]
       }
     ]
   },
