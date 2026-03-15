@@ -52,6 +52,11 @@
           ],
           "default": "reuseTab",
           "description": "Controls how the decode/encode panel is opened."
+        },
+        "protobuf-tool.enableCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show CodeLens actions above each message definition in .proto files."
         }
       }
     }

@@ -15,7 +15,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register CodeLens provider for .proto files — shows a "Decode as <MessageName>" lens above each message definition
 	class ProtoCodeLensProvider implements vscode.CodeLensProvider {
+		private readonly _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
+		readonly onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
+
+		fire() { this._onDidChangeCodeLenses.fire(); }
+
 		provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
+			const enabled = vscode.workspace.getConfiguration('protobuf-tool').get<boolean>('enableCodeLens', true);
+			if (!enabled) { return []; }
 			const lenses: vscode.CodeLens[] = [];
 			const text = document.getText();
 			const messageRegex = /^message\s+(\w+)\s*\{/gm;
@@ -33,8 +40,17 @@ export function activate(context: vscode.ExtensionContext) {
 			return lenses;
 		}
 	}
-	const codelensProviderDisposable = vscode.languages.registerCodeLensProvider({ language: 'proto' }, new ProtoCodeLensProvider());
+	const codeLensProvider = new ProtoCodeLensProvider();
+	const codelensProviderDisposable = vscode.languages.registerCodeLensProvider({ language: 'proto' }, codeLensProvider);
 	context.subscriptions.push(codelensProviderDisposable);
+
+	// Refresh CodeLens immediately when the setting is toggled
+	const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(e => {
+		if (e.affectsConfiguration('protobuf-tool.enableCodeLens')) {
+			codeLensProvider.fire();
+		}
+	});
+	context.subscriptions.push(configChangeDisposable);
 
 	// Register the CodeLens command — opens the decoder panel for the chosen message
 	const decodeMessageDisposable = vscode.commands.registerCommand(

@@ -410,6 +410,9 @@ export class ProtoDecoderPanel {
                 document.getElementById('tab-' + t).classList.toggle('active', t === name);
                 document.getElementById('panel-' + t).classList.toggle('active', t === name);
             });
+            if (name === 'encode' && !encodeInputEl.value.trim()) {
+                generateTemplate();
+            }
         }
 
         // ── DECODE ───────────────────────────────────────────────────────────
