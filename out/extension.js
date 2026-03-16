@@ -86,7 +86,7 @@ function activate(context) {
     context.subscriptions.push(configChangeDisposable);
     // Register the CodeLens command — opens the decoder panel for the chosen message
     const decodeMessageDisposable = vscode.commands.registerCommand('protobuf-tool.decodeMessage', (uri, messageName) => {
-        ProtoDecoderPanel_1.ProtoDecoderPanel.createOrShow(uri.fsPath, messageName);
+        ProtoDecoderPanel_1.ProtoDecoderPanel.createOrShow(uri.fsPath, messageName, context.extensionUri);
     });
     context.subscriptions.push(decodeMessageDisposable);
     // Register command-palette command — picks a message and opens the decode/encode panel
@@ -130,7 +130,7 @@ function activate(context) {
             });
         }
         if (messageName) {
-            ProtoDecoderPanel_1.ProtoDecoderPanel.createOrShow(fileUri.fsPath, messageName);
+            ProtoDecoderPanel_1.ProtoDecoderPanel.createOrShow(fileUri.fsPath, messageName, context.extensionUri);
         }
     });
     context.subscriptions.push(openDecodePanelDisposable);

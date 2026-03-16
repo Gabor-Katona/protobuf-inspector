@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const decodeMessageDisposable = vscode.commands.registerCommand(
 		'protobuf-tool.decodeMessage',
 		(uri: vscode.Uri, messageName: string) => {
-			ProtoDecoderPanel.createOrShow(uri.fsPath, messageName);
+			ProtoDecoderPanel.createOrShow(uri.fsPath, messageName, context.extensionUri);
 		}
 	);
 	context.subscriptions.push(decodeMessageDisposable);
@@ -107,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			if (messageName) {
-				ProtoDecoderPanel.createOrShow(fileUri.fsPath, messageName);
+				ProtoDecoderPanel.createOrShow(fileUri.fsPath, messageName, context.extensionUri);
 			}
 		}
 	);
