@@ -161,13 +161,26 @@ class ProtoDecoderPanel {
 </head>
 <body>
     <div class="header">
-        <h1>&#128268; <strong>${escapedMessageName}</strong></h1>
+        <h1 class="header-title">
+            <i class="codicon codicon-symbol-class header-icon" aria-hidden="true"></i>
+            <strong>${escapedMessageName}</strong>
+        </h1>
         <div class="subtitle">from <code>${escapedFileName}</code></div>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" id="tab-decode">&#9654; Decode</button>
-        <button class="tab-btn" id="tab-encode">&#11178; Encode</button>
+        <button class="tab-btn active" id="tab-decode">
+            <span class="btn-content">
+                <i class="codicon codicon-play" aria-hidden="true"></i>
+                <span>Decode</span>
+            </span>
+        </button>
+        <button class="tab-btn" id="tab-encode">
+            <span class="btn-content">
+                <i class="codicon codicon-arrow-left" aria-hidden="true"></i>
+                <span>Encode</span>
+            </span>
+        </button>
     </div>
 
     <div class="tab-panel active" id="panel-decode">
@@ -188,7 +201,12 @@ class ProtoDecoderPanel {
         ></textarea>
         <div class="hint" id="decode-hint">Paste base64-encoded binary protobuf payload (e.g. <code>CgVXb3JsZA==</code>)</div>
         <div class="actions">
-            <button id="decode-btn">&#9654; Decode</button>
+            <button id="decode-btn">
+                <span class="btn-content">
+                    <i class="codicon codicon-play" aria-hidden="true"></i>
+                    <span>Decode</span>
+                </span>
+            </button>
             <button class="clear-btn" id="decode-clear-btn">Clear</button>
         </div>
         <div class="output-actions">
@@ -229,7 +247,12 @@ class ProtoDecoderPanel {
         ></textarea>
         <div class="hint">Enter a JSON object matching the <code>${escapedMessageName}</code> message structure. Use <em>Generate Template</em> to prefill the schema.</div>
         <div class="actions">
-            <button id="encode-btn">&#11178; Encode</button>
+            <button id="encode-btn">
+                <span class="btn-content">
+                    <i class="codicon codicon-arrow-left" aria-hidden="true"></i>
+                    <span>Encode</span>
+                </span>
+            </button>
             <button class="clear-btn" id="encode-clear-btn">Clear</button>
         </div>
         <div class="output-actions">

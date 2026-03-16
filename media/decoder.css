@@ -21,6 +21,17 @@ body {
     color: var(--vscode-foreground);
 }
 
+.header .header-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header .header-icon {
+    font-size: 18px;
+    color: var(--vscode-descriptionForeground);
+}
+
 .header .subtitle {
     font-size: 0.85em;
     color: var(--vscode-descriptionForeground);
