@@ -59,7 +59,6 @@ function setDecodeFormat(fmt) {
 
 function decode() {
     decodeBtnEl.disabled = true;
-    decodeBtnEl.textContent = '\u23f3 Decoding...';
     decodeOutputEl.className = 'output-box empty';
     decodeOutputEl.textContent = '\u2014 Decoding\u2026 \u2014';
     vscode.postMessage({ command: 'decode', data: decodeInputEl.value, format: decodeFormat });
@@ -81,7 +80,6 @@ function setEncodeFormat(fmt) {
 
 function encodeMsg() {
     encodeBtnEl.disabled = true;
-    encodeBtnEl.textContent = '\u23f3 Encoding...';
     encodeOutputEl.className = 'output-box empty';
     encodeOutputEl.textContent = '\u2014 Encoding\u2026 \u2014';
     vscode.postMessage({ command: 'encode', data: encodeInputEl.value, format: encodeFormat });
@@ -89,7 +87,6 @@ function encodeMsg() {
 
 function generateTemplate() {
     templateBtnEl.disabled = true;
-    templateBtnEl.textContent = '\u23f3 Loading...';
     vscode.postMessage({ command: 'getTemplate' });
 }
 
@@ -146,27 +143,22 @@ window.addEventListener('message', (event) => {
 
     if (msg.command === 'result') {
         decodeBtnEl.disabled = false;
-        decodeBtnEl.textContent = '\u25b6 Decode';
         decodeOutputEl.className = 'output-box success';
         decodeOutputEl.textContent = msg.json;
     } else if (msg.command === 'error') {
         decodeBtnEl.disabled = false;
-        decodeBtnEl.textContent = '\u25b6 Decode';
         decodeOutputEl.className = 'output-box error';
         decodeOutputEl.textContent = '\u26a0 ' + msg.message;
     } else if (msg.command === 'encodeResult') {
         encodeBtnEl.disabled = false;
-        encodeBtnEl.textContent = '\u21d2 Encode';
         encodeOutputEl.className = 'output-box success';
         encodeOutputEl.textContent = msg.output;
     } else if (msg.command === 'encodeError') {
         encodeBtnEl.disabled = false;
-        encodeBtnEl.textContent = '\u21d2 Encode';
         encodeOutputEl.className = 'output-box error';
         encodeOutputEl.textContent = '\u26a0 ' + msg.message;
     } else if (msg.command === 'templateResult') {
         templateBtnEl.disabled = false;
-        templateBtnEl.textContent = '\ud83d\udcc4 Generate Template';
         encodeInputEl.value = msg.json;
     }
 });

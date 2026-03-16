@@ -96,7 +96,10 @@ class ProtoDecoderPanel {
         const panel = vscode.window.createWebviewPanel('protobufDecoder', `Decode: ${messageName}`, column || vscode.ViewColumn.Active, {
             enableScripts: true,
             retainContextWhenHidden: true,
-            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
+            localResourceRoots: [
+                vscode.Uri.joinPath(extensionUri, 'media'),
+                vscode.Uri.joinPath(extensionUri, 'node_modules', '@vscode', 'codicons', 'dist')
+            ]
         });
         ProtoDecoderPanel._panels.set(key, new ProtoDecoderPanel(panel, protoFilePath, messageName, extensionUri));
     }
@@ -144,14 +147,16 @@ class ProtoDecoderPanel {
         const escapedMessageName = this._escapeHtml(messageName);
         const stylesUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'decoder.css'));
         const scriptUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'decoder.js'));
+        const codiconsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode', 'codicons', 'dist', 'codicon.css'));
         const nonce = this._getNonce();
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._panel.webview.cspSource}; script-src 'nonce-${nonce}';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._panel.webview.cspSource}; font-src ${this._panel.webview.cspSource}; script-src 'nonce-${nonce}';">  
     <title>Proto Tool: ${escapedMessageName}</title>
+    <link rel="stylesheet" href="${codiconsUri}">
     <link rel="stylesheet" href="${stylesUri}">
 </head>
 <body>
@@ -188,7 +193,12 @@ class ProtoDecoderPanel {
         </div>
         <div class="output-actions">
             <div class="section-label no-margin">Decoded Output (JSON)</div>
-            <button class="copy-btn small-btn" id="dec-copy-btn">&#128203; Copy</button>
+            <button class="copy-btn small-btn" id="dec-copy-btn">
+                <span class="btn-content">
+                    <i class="codicon codicon-copy" aria-hidden="true"></i>
+                    <span>Copy</span>
+                </span>
+            </button>
         </div>
         <div class="output-wrap">
             <pre id="decode-output" class="output-box empty">— Output will appear here —</pre>
@@ -202,7 +212,12 @@ class ProtoDecoderPanel {
                 <button class="fmt-btn active" id="enc-btn-base64">Base64</button>
                 <button class="fmt-btn" id="enc-btn-hex">Hex</button>
             </div>
-            <button class="template-btn" id="template-btn">&#128196; Generate Template</button>
+            <button class="template-btn" id="template-btn">
+                <span class="btn-content">
+                    <i class="codicon codicon-file-add" aria-hidden="true"></i>
+                    <span>Generate Template</span>
+                </span>
+            </button>
         </div>
         <div class="section-label mt-12">JSON Input</div>
         <textarea
@@ -219,7 +234,12 @@ class ProtoDecoderPanel {
         </div>
         <div class="output-actions">
             <div class="section-label no-margin">Encoded Output</div>
-            <button class="copy-btn small-btn" id="enc-copy-btn">&#128203; Copy</button>
+            <button class="copy-btn small-btn" id="enc-copy-btn">
+                <span class="btn-content">
+                    <i class="codicon codicon-copy" aria-hidden="true"></i>
+                    <span>Copy</span>
+                </span>
+            </button>
         </div>
         <div class="output-wrap">
             <pre id="encode-output" class="output-box empty">— Output will appear here —</pre>
