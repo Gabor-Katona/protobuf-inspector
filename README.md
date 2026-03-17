@@ -1,6 +1,6 @@
-# protobuf-tool README
+# protobuf-inspector README
 
-This is the README for your extension "protobuf-tool". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "protobuf-inspector". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

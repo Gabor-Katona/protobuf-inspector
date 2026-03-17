@@ -46,7 +46,7 @@ export class ProtoDecoderPanel {
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
 
-        const config = vscode.workspace.getConfiguration('protobuf-tool');
+        const config = vscode.workspace.getConfiguration('protobuf-inspector');
         const reuseTab = config.get<string>('panelMode', 'newTab') === 'reuseTab';
 
         if (reuseTab) {
@@ -123,7 +123,7 @@ export class ProtoDecoderPanel {
     }
 
     private _update(): void {
-        this._panel.title = `Proto Tool: ${this._service.messageName}`;
+        this._panel.title = `Protobuf Inspector: ${this._service.messageName}`;
         this._panel.webview.html = this._getHtmlForWebview();
     }
 
@@ -143,7 +143,7 @@ export class ProtoDecoderPanel {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._panel.webview.cspSource}; font-src ${this._panel.webview.cspSource}; script-src 'nonce-${nonce}';">  
-    <title>Proto Tool: ${escapedMessageName}</title>
+    <title>Protobuf Inspector: ${escapedMessageName}</title>
     <link rel="stylesheet" href="${codiconsUri}">
     <link rel="stylesheet" href="${stylesUri}">
 </head>

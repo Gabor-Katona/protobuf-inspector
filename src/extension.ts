@@ -7,12 +7,6 @@ import { ProtoDecoderPanel } from './ProtoDecoderPanel';
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Register Hello World command
-	const disposable = vscode.commands.registerCommand('protobuf-tool.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from protobuf-tool!');
-	});
-	context.subscriptions.push(disposable);
-
 	// Register CodeLens provider for .proto files — shows a "Decode as <MessageName>" lens above each message definition
 	class ProtoCodeLensProvider implements vscode.CodeLensProvider {
 		private readonly _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
@@ -21,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 		fire() { this._onDidChangeCodeLenses.fire(); }
 
 		provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
-			const enabled = vscode.workspace.getConfiguration('protobuf-tool').get<boolean>('enableCodeLens', true);
+			const enabled = vscode.workspace.getConfiguration('protobuf-inspector').get<boolean>('enableCodeLens', true);
 			if (!enabled) { return []; }
 			const lenses: vscode.CodeLens[] = [];
 			const text = document.getText();
@@ -33,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const range = new vscode.Range(pos, pos);
 				lenses.push(new vscode.CodeLens(range, {
 					title: `$(symbol-class) Decode as ${messageName}`,
-					command: 'protobuf-tool.decodeMessage',
+					command: 'protobuf-inspector.decodeMessage',
 					arguments: [document.uri, messageName]
 				}));
 			}
@@ -46,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Refresh CodeLens immediately when the setting is toggled
 	const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(e => {
-		if (e.affectsConfiguration('protobuf-tool.enableCodeLens')) {
+		if (e.affectsConfiguration('protobuf-inspector.enableCodeLens')) {
 			codeLensProvider.fire();
 		}
 	});
@@ -54,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register the CodeLens command — opens the decoder panel for the chosen message
 	const decodeMessageDisposable = vscode.commands.registerCommand(
-		'protobuf-tool.decodeMessage',
+		'protobuf-inspector.decodeMessage',
 		(uri: vscode.Uri, messageName: string) => {
 			ProtoDecoderPanel.createOrShow(uri.fsPath, messageName, context.extensionUri);
 		}
@@ -63,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register command-palette command — picks a message and opens the decode/encode panel
 	const openDecodePanelDisposable = vscode.commands.registerCommand(
-		'protobuf-tool.openDecodePanel',
+		'protobuf-inspector.openDecodePanel',
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 

@@ -1,6 +1,6 @@
 {
-  "name": "protobuf-tool",
-  "displayName": "protobuf-tool",
+  "name": "protobuf-inspector",
+  "displayName": "Protobuf Inspector",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -16,16 +16,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "protobuf-tool.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "protobuf-tool.decodeMessage",
+        "command": "protobuf-inspector.decodeMessage",
         "title": "Decode Protobuf Message"
       },
       {
-        "command": "protobuf-tool.openDecodePanel",
-        "title": "Protobuf Tools: Open Decode/Encode Panel"
+        "command": "protobuf-inspector.openDecodePanel",
+        "title": "Protobuf Inspector: Open Decode/Encode Panel"
       }
     ],
     "languages": [
@@ -40,9 +36,9 @@
       }
     ],
     "configuration": {
-      "title": "Protobuf Tool",
+      "title": "Protobuf Inspector",
       "properties": {
-        "protobuf-tool.panelMode": {
+        "protobuf-inspector.panelMode": {
           "type": "string",
           "enum": [
             "reuseTab",
@@ -55,7 +51,7 @@
           "default": "reuseTab",
           "description": "Controls how the decode/encode panel is opened."
         },
-        "protobuf-tool.enableCodeLens": {
+        "protobuf-inspector.enableCodeLens": {
           "type": "boolean",
           "default": true,
           "description": "Show CodeLens actions above each message definition in .proto files."
