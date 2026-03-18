@@ -48,7 +48,7 @@ export class ProtoDecoderPanel {
             : undefined;
 
         const config = vscode.workspace.getConfiguration('protobuf-inspector');
-        const reuseTab = config.get<string>('panelMode', 'newTab') === 'reuseTab';
+        const reuseTab = config.get<string>('panelMode', 'reuseTab') === 'reuseTab';
 
         if (reuseTab) {
             // Reuse the single shared panel if one is open

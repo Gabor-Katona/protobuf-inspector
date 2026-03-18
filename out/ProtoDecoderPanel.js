@@ -72,7 +72,7 @@ class ProtoDecoderPanel {
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
         const config = vscode.workspace.getConfiguration('protobuf-inspector');
-        const reuseTab = config.get('panelMode', 'newTab') === 'reuseTab';
+        const reuseTab = config.get('panelMode', 'reuseTab') === 'reuseTab';
         if (reuseTab) {
             // Reuse the single shared panel if one is open
             const sharedEntry = ProtoDecoderPanel._panels.values().next();

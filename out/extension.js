@@ -39,36 +39,36 @@ exports.deactivate = deactivate;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(require("vscode"));
 const ProtoDecoderPanel_1 = require("./ProtoDecoderPanel");
+class ProtoCodeLensProvider {
+    _onDidChangeCodeLenses = new vscode.EventEmitter();
+    onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
+    fire() { this._onDidChangeCodeLenses.fire(); }
+    provideCodeLenses(document, _token) {
+        const enabled = vscode.workspace.getConfiguration('protobuf-inspector').get('enableCodeLens', true);
+        if (!enabled) {
+            return [];
+        }
+        const lenses = [];
+        const text = document.getText();
+        const messageRegex = /^message\s+(\w+)\s*\{/gm;
+        let match;
+        while ((match = messageRegex.exec(text)) !== null) {
+            const messageName = match[1];
+            const pos = document.positionAt(match.index);
+            const range = new vscode.Range(pos, pos);
+            lenses.push(new vscode.CodeLens(range, {
+                title: `$(symbol-class) Decode as ${messageName}`,
+                command: 'protobuf-inspector.decodeMessage',
+                arguments: [document.uri, messageName]
+            }));
+        }
+        return lenses;
+    }
+}
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 function activate(context) {
     // Register CodeLens provider for .proto files — shows a "Decode as <MessageName>" lens above each message definition
-    class ProtoCodeLensProvider {
-        _onDidChangeCodeLenses = new vscode.EventEmitter();
-        onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
-        fire() { this._onDidChangeCodeLenses.fire(); }
-        provideCodeLenses(document, _token) {
-            const enabled = vscode.workspace.getConfiguration('protobuf-inspector').get('enableCodeLens', true);
-            if (!enabled) {
-                return [];
-            }
-            const lenses = [];
-            const text = document.getText();
-            const messageRegex = /^message\s+(\w+)\s*\{/gm;
-            let match;
-            while ((match = messageRegex.exec(text)) !== null) {
-                const messageName = match[1];
-                const pos = document.positionAt(match.index);
-                const range = new vscode.Range(pos, pos);
-                lenses.push(new vscode.CodeLens(range, {
-                    title: `$(symbol-class) Decode as ${messageName}`,
-                    command: 'protobuf-inspector.decodeMessage',
-                    arguments: [document.uri, messageName]
-                }));
-            }
-            return lenses;
-        }
-    }
     const codeLensProvider = new ProtoCodeLensProvider();
     const codelensProviderDisposable = vscode.languages.registerCodeLensProvider({ language: 'proto' }, codeLensProvider);
     context.subscriptions.push(codelensProviderDisposable);

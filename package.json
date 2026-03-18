@@ -1,13 +1,21 @@
 {
   "name": "protobuf-inspector",
   "displayName": "Protobuf Inspector",
-  "description": "",
+  "description": "Decode and encode Protobuf messages directly in VS Code using your .proto schema files.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
+    "Programming Languages",
     "Other"
+  ],
+  "keywords": [
+    "protobuf",
+    "proto",
+    "decode",
+    "encode",
+    "grpc"
   ],
   "activationEvents": [
     "onLanguage:proto",
@@ -36,6 +44,11 @@
         ]
       }
     ],
+    "menus": {
+      "commandPalette": [
+        { "command": "protobuf-inspector.decodeMessage", "when": "false" }
+      ]
+    },
     "configuration": {
       "title": "Protobuf Inspector",
       "properties": {
