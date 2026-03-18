@@ -155,6 +155,7 @@ window.addEventListener('message', (event) => {
         encodeOutputEl.textContent = msg.output;
     } else if (msg.command === 'encodeError') {
         encodeBtnEl.disabled = false;
+        templateBtnEl.disabled = false;
         encodeOutputEl.className = 'output-box error';
         encodeOutputEl.textContent = '\u26a0 ' + msg.message;
     } else if (msg.command === 'templateResult') {

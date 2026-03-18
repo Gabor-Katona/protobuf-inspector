@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtoDecoderPanel = void 0;
 const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
+const crypto_1 = require("crypto");
 const ProtoService_1 = require("./ProtoService");
 class ProtoDecoderPanel {
     static _panels = new Map();
@@ -282,12 +283,7 @@ class ProtoDecoderPanel {
             .replace(/'/g, '&#39;');
     }
     _getNonce() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let nonce = '';
-        for (let i = 0; i < 32; i += 1) {
-            nonce += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return nonce;
+        return (0, crypto_1.randomBytes)(16).toString('hex');
     }
     dispose() {
         ProtoDecoderPanel._panels.delete(this._key);

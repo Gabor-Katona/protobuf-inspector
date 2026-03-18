@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { randomBytes } from 'crypto';
 import { ProtoService } from './ProtoService';
 
 export class ProtoDecoderPanel {
@@ -272,12 +273,7 @@ export class ProtoDecoderPanel {
     }
 
     private _getNonce(): string {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let nonce = '';
-        for (let i = 0; i < 32; i += 1) {
-            nonce += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return nonce;
+        return randomBytes(16).toString('hex');
     }
 
     public dispose(): void {
