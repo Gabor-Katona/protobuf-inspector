@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { ProtoDecoderPanel } from './ProtoDecoderPanel';
 
+const MESSAGE_REGEX_SOURCE = '^message\\s+(\\w+)\\s*\\{';
+
 class ProtoCodeLensProvider implements vscode.CodeLensProvider {
 	private readonly _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
 	readonly onDidChangeCodeLenses = this._onDidChangeCodeLenses.event;
@@ -12,17 +14,24 @@ class ProtoCodeLensProvider implements vscode.CodeLensProvider {
 		if (!enabled) { return []; }
 		const lenses: vscode.CodeLens[] = [];
 		const text = document.getText();
-		const messageRegex = /^message\s+(\w+)\s*\{/gm;
+		const messageRegex = new RegExp(MESSAGE_REGEX_SOURCE, 'gm');
 		let match: RegExpExecArray | null;
 		while ((match = messageRegex.exec(text)) !== null) {
 			const messageName = match[1];
 			const pos = document.positionAt(match.index);
 			const range = new vscode.Range(pos, pos);
-			lenses.push(new vscode.CodeLens(range, {
-				title: `$(symbol-class) Inspect ${messageName}`,
-				command: 'protobuf-inspector.decodeMessage',
-				arguments: [document.uri, messageName]
-			}));
+			if (document.isDirty) {
+				lenses.push(new vscode.CodeLens(range, {
+					title: `$(save) Save to inspect ${messageName}`,
+					command: 'workbench.action.files.save'
+				}));
+			} else {
+				lenses.push(new vscode.CodeLens(range, {
+					title: `$(symbol-class) Inspect ${messageName}`,
+					command: 'protobuf-inspector.decodeMessage',
+					arguments: [document.uri, messageName]
+				}));
+			}
 		}
 		return lenses;
 	}
@@ -44,6 +53,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 	context.subscriptions.push(configChangeDisposable);
+
+	// Refresh CodeLens when a proto file is saved or changed (to show/hide lenses based on dirty state)
+	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(doc => {
+		if (doc.languageId === 'proto') { codeLensProvider.fire(); }
+	}));
+	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(e => {
+		if (e.document.languageId === 'proto') { codeLensProvider.fire(); }
+	}));
 
 	// Register the CodeLens command — opens the decoder panel for the chosen message
 	const decodeMessageDisposable = vscode.commands.registerCommand(
@@ -77,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const document = await vscode.workspace.openTextDocument(fileUri);
 			const text = document.getText();
-			const messageRegex = /^message\s+(\w+)\s*\{/gm;
+			const messageRegex = new RegExp(MESSAGE_REGEX_SOURCE, 'gm');
 			const messages: string[] = [];
 			let match: RegExpExecArray | null;
 			while ((match = messageRegex.exec(text)) !== null) {

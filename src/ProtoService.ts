@@ -50,11 +50,11 @@ export class ProtoService {
             }
             buffer = Buffer.from(hexClean, 'hex');
         } else {
-            try {
-                buffer = Buffer.from(trimmed, 'base64');
-            } catch {
+            const b64Clean = trimmed.replace(/\s+/g, '');
+            if (!/^[A-Za-z0-9+/]*(={0,2})$/.test(b64Clean)) {
                 throw new Error('Invalid base64 input. Please check and try again.');
             }
+            buffer = Buffer.from(b64Clean, 'base64');
         }
 
         const messageType = await this._loadType();
