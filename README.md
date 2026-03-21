@@ -1,71 +1,106 @@
-# protobuf-inspector README
+# Protobuf Inspector
 
-This is the README for your extension "protobuf-inspector". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+**Decode and encode Protobuf messages directly inside VS Code** — no external tools, no command line. Just open a `.proto` file, click a lens, and inspect your binary data.
 
 ---
 
-## Following extension guidelines
+## Features
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### One-click Inspect from your `.proto` file
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+A **CodeLens** action appears above every `message` definition. Click **Inspect \<MessageName\>** to instantly open the decode/encode panel for that message — no configuration needed.
 
-## Working with Markdown
+![CodeLens above a message definition](images/codelens.png)
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+---
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+### Decode binary Protobuf messages
 
-## For more information
+Paste a **Base64** or **Hex** encoded binary payload and decode it into a clean, readable JSON representation. The panel displays the decoded result with full field names and values from your schema.
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+![Decode panel showing binary input and JSON output](images/decode.png)
 
-**Enjoy!**
+---
+
+### Encode JSON back to Protobuf binary
+
+Switch to the **Encode** tab, paste a JSON object and get the binary-encoded Protobuf output in Base64 or Hex format. The extension validates the JSON against your schema before encoding.
+
+![Encode panel showing JSON input and binary output](images/encode.png)
+
+---
+
+### Command Palette support
+
+Run **Protobuf Inspector: Open Decode/Encode Panel** from the Command Palette (`Ctrl+Shift+P`):
+
+- **If a `.proto` file is active in the editor** — the extension uses it automatically and shows a message picker listing all `message` definitions found in that file.
+- **If no `.proto` file is open** — a file dialog opens so you can browse to any `.proto` file on disk, then the message picker appears.
+
+---
+
+### Auto-generate a JSON template
+
+Not sure what fields a message has? Use the **Generate Template** button to auto-fill the editor with a skeleton JSON object containing all fields of the message, including nested messages, repeated fields, and enums — with sensible placeholder values.
+
+---
+
+### Live schema reload
+
+When you save your `.proto` file, the panel automatically reloads the schema — no need to close and reopen anything. If your file has unsaved changes, the CodeLens shows a **Save to inspect** prompt instead.
+
+---
+
+## Usage
+
+1. Open a `.proto` file in VS Code.
+2. Click the **Inspect \<MessageName\>** CodeLens above any `message` definition.
+3. In the **Decode** tab: paste your Base64 or Hex payload and click **Decode**.
+4. In the **Encode** tab: paste or generate a JSON template and click **Encode**.
+
+> **Tip:** Use the **Generate Template** button on the Encode tab to scaffold a valid JSON structure from your message definition.
+
+---
+
+## Extension Settings
+
+| Setting | Default | Description |
+|---|---|---|
+| `protobuf-inspector.panelMode` | `reuseTab` | `reuseTab` — reuse a single shared panel; `newTab` — open a separate panel per message |
+| `protobuf-inspector.enableCodeLens` | `true` | Show or hide the **Inspect** CodeLens above message definitions in `.proto` files |
+
+---
+
+## Requirements
+
+No external dependencies or CLI tools required. Everything runs inside VS Code.
+
+---
+
+## Known Issues
+
+- Only top-level `.proto` files are directly supported; schemas with complex multi-file `import` chains may not resolve all types correctly.
+- The extension currently supports **proto3** syntax. Proto2 files may work partially.
+
+---
+
+## Release Notes
+
+### 1.0.0
+
+Initial release:
+- Decode Protobuf binary (Base64 / Hex) to JSON
+- Encode JSON to Protobuf binary (Base64 / Hex)
+- Auto-generate JSON templates from message definitions
+- CodeLens integration for `.proto` files
+- Live schema reload on file save
+- Command Palette command to open any `.proto` file
+
+---
+
+## Third-Party Notices
+
+This extension uses the following open-source packages:
+
+- **[protobufjs](https://github.com/protobufjs/protobuf.js)** — BSD 3-Clause License. Copyright © 2016, Daniel Wirtz.
+- **[@vscode/codicons](https://github.com/microsoft/vscode-codicons)** — Icon font licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); code licensed under MIT. Copyright © Microsoft Corporation.
