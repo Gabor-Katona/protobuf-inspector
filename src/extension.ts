@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { ProtoDecoderPanel } from './ProtoDecoderPanel';
 
@@ -21,7 +19,7 @@ class ProtoCodeLensProvider implements vscode.CodeLensProvider {
 			const pos = document.positionAt(match.index);
 			const range = new vscode.Range(pos, pos);
 			lenses.push(new vscode.CodeLens(range, {
-				title: `$(symbol-class) Decode as ${messageName}`,
+				title: `$(symbol-class) Inspect ${messageName}`,
 				command: 'protobuf-inspector.decodeMessage',
 				arguments: [document.uri, messageName]
 			}));

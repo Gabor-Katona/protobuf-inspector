@@ -35,8 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(require("vscode"));
 const ProtoDecoderPanel_1 = require("./ProtoDecoderPanel");
 class ProtoCodeLensProvider {
@@ -57,7 +55,7 @@ class ProtoCodeLensProvider {
             const pos = document.positionAt(match.index);
             const range = new vscode.Range(pos, pos);
             lenses.push(new vscode.CodeLens(range, {
-                title: `$(symbol-class) Decode as ${messageName}`,
+                title: `$(symbol-class) Inspect ${messageName}`,
                 command: 'protobuf-inspector.decodeMessage',
                 arguments: [document.uri, messageName]
             }));

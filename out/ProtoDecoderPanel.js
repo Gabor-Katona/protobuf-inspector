@@ -94,7 +94,7 @@ class ProtoDecoderPanel {
             }
         }
         const key = ProtoDecoderPanel._makeKey(protoFilePath, messageName);
-        const panel = vscode.window.createWebviewPanel('protobufDecoder', `Decode: ${messageName}`, column || vscode.ViewColumn.Active, {
+        const panel = vscode.window.createWebviewPanel('protobufInspector', `Protobuf Inspector: ${messageName}`, column || vscode.ViewColumn.Active, {
             enableScripts: true,
             retainContextWhenHidden: true,
             localResourceRoots: [
