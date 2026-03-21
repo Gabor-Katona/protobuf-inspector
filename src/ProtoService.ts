@@ -5,14 +5,24 @@ export class ProtoService {
     public readonly protoFilePath: string;
     public readonly messageName: string;
 
+    private _cachedType: protobuf.Type | null = null;
+
     constructor(protoFilePath: string, messageName: string) {
         this.protoFilePath = protoFilePath;
         this.messageName = messageName;
     }
 
+    public invalidateCache(): void {
+        this._cachedType = null;
+    }
+
     // ── Shared helper ────────────────────────────────────────────────────────
 
     private async _loadType(): Promise<protobuf.Type> {
+        if (this._cachedType) {
+            return this._cachedType;
+        }
+
         let root: protobuf.Root;
         try {
             root = await protobuf.load(this.protoFilePath);
@@ -22,12 +32,14 @@ export class ProtoService {
         }
 
         try {
-            return root.lookupType(this.messageName);
+            this._cachedType = root.lookupType(this.messageName);
         } catch {
             throw new Error(
                 `Message type '${this.messageName}' not found in ${path.basename(this.protoFilePath)}.`
             );
         }
+
+        return this._cachedType;
     }
 
     // ── Decode ───────────────────────────────────────────────────────────────

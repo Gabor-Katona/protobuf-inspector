@@ -39,12 +39,19 @@ const path = __importStar(require("path"));
 class ProtoService {
     protoFilePath;
     messageName;
+    _cachedType = null;
     constructor(protoFilePath, messageName) {
         this.protoFilePath = protoFilePath;
         this.messageName = messageName;
     }
+    invalidateCache() {
+        this._cachedType = null;
+    }
     // ── Shared helper ────────────────────────────────────────────────────────
     async _loadType() {
+        if (this._cachedType) {
+            return this._cachedType;
+        }
         let root;
         try {
             root = await protobuf.load(this.protoFilePath);
@@ -54,11 +61,12 @@ class ProtoService {
             throw new Error(`Failed to parse .proto file: ${msg}`);
         }
         try {
-            return root.lookupType(this.messageName);
+            this._cachedType = root.lookupType(this.messageName);
         }
         catch {
             throw new Error(`Message type '${this.messageName}' not found in ${path.basename(this.protoFilePath)}.`);
         }
+        return this._cachedType;
     }
     // ── Decode ───────────────────────────────────────────────────────────────
     async decode(input, format) {

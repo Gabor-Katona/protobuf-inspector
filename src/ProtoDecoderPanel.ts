@@ -23,6 +23,12 @@ export class ProtoDecoderPanel {
 
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
+        vscode.workspace.onDidSaveTextDocument((doc) => {
+            if (doc.uri.fsPath === this._service.protoFilePath) {
+                this._service.invalidateCache();
+            }
+        }, null, this._disposables);
+
         this._panel.webview.onDidReceiveMessage(
             async (message) => {
                 if (message.command === 'decode') {
