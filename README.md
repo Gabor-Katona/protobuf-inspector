@@ -10,23 +10,15 @@
 
 A **CodeLens** action appears above every `message` definition. Click **Inspect \<MessageName\>** to instantly open the decode/encode panel for that message — no configuration needed.
 
-![CodeLens above a message definition](images/codelens.png)
+![CodeLens above a message definition](images/codelens.gif)
 
 ---
 
-### Decode binary Protobuf messages
+### Encode and Decode Protobuf messages
 
-Paste a **Base64** or **Hex** encoded binary payload and decode it into a clean, readable JSON representation. The panel displays the decoded result with full field names and values from your schema.
+Easily convert between binary Protobuf (Base64/Hex) and JSON using the **Decode** and **Encode** tabs. Paste your payload or JSON, click the respective button, and see the result instantly. The panel validates your input and displays the output with full field names and values from your schema.
 
-![Decode panel showing binary input and JSON output](images/decode.png)
-
----
-
-### Encode JSON back to Protobuf binary
-
-Switch to the **Encode** tab, paste a JSON object and get the binary-encoded Protobuf output in Base64 or Hex format. The extension validates the JSON against your schema before encoding.
-
-![Encode panel showing JSON input and binary output](images/encode.png)
+![Encode and decode panel in action](images/encode-decode.gif)
 
 ---
 
@@ -77,13 +69,6 @@ No external dependencies or CLI tools required. Everything runs inside VS Code.
 
 ---
 
-## Known Issues
-
-- Only top-level `.proto` files are directly supported; schemas with complex multi-file `import` chains may not resolve all types correctly.
-- The extension currently supports **proto3** syntax. Proto2 files may work partially.
-
----
-
 ## Release Notes
 
 ### 1.0.0
@@ -95,6 +80,12 @@ Initial release:
 - CodeLens integration for `.proto` files
 - Live schema reload on file save
 - Command Palette command to open any `.proto` file
+
+---
+
+## License
+
+This extension is licensed under the [MIT License](LICENSE).
 
 ---
 
