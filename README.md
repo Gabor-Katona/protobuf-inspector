@@ -10,7 +10,7 @@
 
 A **CodeLens** action appears above every `message` definition. Click **Inspect \<MessageName\>** to instantly open the decode/encode panel for that message — no configuration needed.
 
-![CodeLens above a message definition](images/codelens.gif)
+![CodeLens above a message definition](https://raw.githubusercontent.com/Gabor-Katona/protobuf-inspector/main/images/codelens.gif)
 
 ---
 
@@ -18,7 +18,7 @@ A **CodeLens** action appears above every `message` definition. Click **Inspect 
 
 Easily convert between binary Protobuf (Base64/Hex) and JSON using the **Decode** and **Encode** tabs. Paste your payload or JSON, click the respective button, and see the result instantly. The panel validates your input and displays the output with full field names and values from your schema.
 
-![Encode and decode panel in action](images/encode-decode.gif)
+![Encode and decode panel in action](https://raw.githubusercontent.com/Gabor-Katona/protobuf-inspector/main/images/encode-decode.gif)
 
 ---
 
