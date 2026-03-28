@@ -1,6 +1,6 @@
 # Protobuf Inspector
 
-**Decode and encode Protobuf messages directly inside VS Code** — no external tools, no command line. Just open a `.proto` file, click a lens, and inspect your binary data.
+**Deserialize and serialize Protobuf messages directly inside VS Code** — no external tools, no command line. Just open a `.proto` file, click a lens, and inspect your binary data.
 
 ---
 
@@ -14,9 +14,9 @@ A **CodeLens** action appears above every `message` definition. Click **Inspect 
 
 ---
 
-### Encode and Decode Protobuf messages
+### Decode and Encode Protobuf messages
 
-Easily convert between binary Protobuf (Base64/Hex) and JSON using the **Decode** and **Encode** tabs. Paste your payload or JSON, click the respective button, and see the result instantly. The panel validates your input and displays the output with full field names and values from your schema.
+Easily convert between binary Protobuf (Base64/Hex) and JSON using the **Decode** (deserialization) and **Encode** (serialization) tabs. Paste your payload or JSON, click the respective button, and see the result instantly. The panel validates your input and displays the output with full field names and values from your schema.
 
 ![Encode and decode panel in action](https://raw.githubusercontent.com/Gabor-Katona/protobuf-inspector/main/images/encode-decode.gif)
 
@@ -47,8 +47,8 @@ When you save your `.proto` file, the panel automatically reloads the schema —
 
 1. Open a `.proto` file in VS Code.
 2. Click the **Inspect \<MessageName\>** CodeLens above any `message` definition.
-3. In the **Decode** tab: paste your Base64 or Hex payload and click **Decode**.
-4. In the **Encode** tab: paste or generate a JSON template and click **Encode**.
+3. In the **Decode** tab (deserialization): paste your Base64 or Hex payload and click **Decode**.
+4. In the **Encode** tab (serialization): paste or generate a JSON template and click **Encode**.
 
 > **Tip:** Use the **Generate Template** button on the Encode tab to scaffold a valid JSON structure from your message definition.
 
@@ -74,8 +74,8 @@ No external dependencies or CLI tools required. Everything runs inside VS Code.
 ### 1.0.0
 
 Initial release:
-- Decode Protobuf binary (Base64 / Hex) to JSON
-- Encode JSON to Protobuf binary (Base64 / Hex)
+- Deserialize (decode) Protobuf binary (Base64 / Hex) to JSON
+- Serialize (encode) JSON to Protobuf binary (Base64 / Hex)
 - Auto-generate JSON templates from message definitions
 - CodeLens integration for `.proto` files
 - Live schema reload on file save

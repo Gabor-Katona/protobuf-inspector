@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtoService = void 0;
 const protobuf = __importStar(require("protobufjs"));
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
 class ProtoService {
     protoFilePath;
     messageName;
@@ -52,9 +53,17 @@ class ProtoService {
         if (this._cachedType) {
             return this._cachedType;
         }
+        try {
+            await fs.promises.access(this.protoFilePath);
+        }
+        catch {
+            throw new Error(`Proto file not found: ${path.basename(this.protoFilePath)}`);
+        }
+        const LOAD_TIMEOUT_MS = 3000;
         let root;
         try {
-            root = await protobuf.load(this.protoFilePath);
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error(`Timed out — the .proto file may have unresolvable imports or an invalid message reference.`)), LOAD_TIMEOUT_MS));
+            root = await Promise.race([protobuf.load(this.protoFilePath), timeoutPromise]);
         }
         catch (e) {
             const msg = e instanceof Error ? e.message : String(e);

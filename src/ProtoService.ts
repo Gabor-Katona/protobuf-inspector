@@ -1,5 +1,6 @@
 import * as protobuf from 'protobufjs';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export class ProtoService {
     public readonly protoFilePath: string;
@@ -23,9 +24,19 @@ export class ProtoService {
             return this._cachedType;
         }
 
+        try {
+            await fs.promises.access(this.protoFilePath);
+        } catch {
+            throw new Error(`Proto file not found: ${path.basename(this.protoFilePath)}`);
+        }
+
+        const LOAD_TIMEOUT_MS = 3000;
         let root: protobuf.Root;
         try {
-            root = await protobuf.load(this.protoFilePath);
+            const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error(`Timed out — the .proto file may have unresolvable imports or an invalid message reference.`)), LOAD_TIMEOUT_MS)
+            );
+            root = await Promise.race([protobuf.load(this.protoFilePath), timeoutPromise]);
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : String(e);
             throw new Error(`Failed to parse .proto file: ${msg}`);

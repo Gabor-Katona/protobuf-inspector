@@ -3,7 +3,7 @@
   "displayName": "Protobuf Inspector",
   "description": "Decode and encode Protobuf messages directly in VS Code using your .proto schema files.",
   "version": "1.0.0",
-  "publisher": "Anotak Robag",
+  "publisher": "anotakrobag",
   "author": {
     "name": "Anotak Robag"
   },
@@ -21,12 +21,12 @@
     "protobuf",
     "proto",
     "decode",
-    "encode",
+    "deserialize",
     "grpc",
     "protocol buffers",
     "binary",
     "serialization",
-    "deserialize"
+    "encode"
   ],
   "activationEvents": [
     "onLanguage:proto"
